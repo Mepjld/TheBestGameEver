@@ -13,17 +13,30 @@ public class PlayerController : MonoBehaviour
 
     private CharacterController _characterController;
 
+
     // Start is called before the first frame update
     void Start()
     {
         _characterController = GetComponent<CharacterController>();
     }
 
-    private void Update()
+    void Update()
     {
-        _moveVector = Vector3.zero; 
+        playerControllerUpdate();
+    }
+
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        gravityFixedUpdate();
+    }
+
+
+    private void playerControllerUpdate()
+    {
+        _moveVector = Vector3.zero;
         //Перемещение
-        if (Input.GetKey(KeyCode.W)) 
+        if (Input.GetKey(KeyCode.W))
         {
             _moveVector += transform.forward;
         }
@@ -43,18 +56,22 @@ public class PlayerController : MonoBehaviour
             _moveVector -= transform.right;
         }
         //Прыжок
-        if (Input.GetKeyDown(KeyCode.Space) && _characterController.isGrounded) 
+        if (Input.GetKeyDown(KeyCode.Space) && _characterController.isGrounded)
         {
             _fallVelocity = -jumpForcce;
         };
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
+    private void gravityFixedUpdate()
     {
-        _characterController.Move(_moveVector * speed * Time.deltaTime);
+        _characterController.Move(_moveVector * speed * Time.fixedDeltaTime);
 
         _fallVelocity += gravity * Time.fixedDeltaTime;
-       _characterController.Move(Vector3.down * _fallVelocity * Time.fixedDeltaTime);
+        _characterController.Move(Vector3.down * _fallVelocity * Time.fixedDeltaTime);
+
+        if (_characterController.isGrounded)
+        {
+            _fallVelocity = 0;
+        }
     }
 }
